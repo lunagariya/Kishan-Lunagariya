@@ -1,0 +1,41 @@
+{% liquid
+  assign variant = product.first_available_variant
+  assign price = variant.price | default: product.price
+  assign money_price = price | money
+
+  if product.price_varies
+    assign money_price = 'products.product.price.from_price_html' | t: price: money_price
+  endif
+  
+%}
+
+
+<div class="quick-view">
+  <div class="quick-view-dialog__product-info">
+    <div class="quick-view-dialog__image">
+      {{ product.featured_image | image_url: width: 800 | image_tag: loading: 'lazy' }}
+    </div>
+    <div class="quick-view-dialog__col">
+      <h2 class="product__title">{{ product.title | escape }}</h2>
+
+      <div class="price-container">
+        <div class="price__sale">{{ money_price }}</div>
+        <div class="price__regular hidden">{{ 0 | money }}</div>
+      </div>
+
+      {%- if product.description != blank -%}
+        <div class="product__description rte quick-add-hidden">
+          {{ product.description }}
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+
+  {% render 'variant-picker', product: product, variant: variant, section: section %}
+
+  <div class="buy-buttons">
+    <input class="quick-view-variant-id hidden" value="" id="variant-id" name="variant-id">
+    <button name="add" disabled class="cta" type="button" data-atc>Add to Cart {{ 'icon-arrow-right.svg' | inline_asset_content }}
+    </button>
+  </div>
+</div>

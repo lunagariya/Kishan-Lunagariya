@@ -1,0 +1,83 @@
+{% comment %} Can take constance from the global settings to merchant can decide {% endcomment %}
+{%- liquid
+  assign product_form_id = 'product-form-' | append: section.id
+  assign size_option_names = 'size,Size,sizes,Sizes' | split: ','
+  assign color_option_names = 'color,Color,colors,Colors,colour,Colour,colours,Colours' | split: ','
+-%}
+{%- capture label_unavailable -%}
+  <span class="visually-hidden label-unavailable">
+    {{- 'products.product.variant_sold_out_or_unavailable' | t -}}
+  </span>
+{%- endcapture -%}
+<variant-picker>
+  {% for option in product.options_with_values %}
+    {% if size_option_names contains option.name %}
+      {% capture size_variant_markup %}
+        {%- capture input_id -%}
+          {{ section.id }}-{{ option.position }}-{{ forloop.index0 -}}
+        {%- endcapture -%}
+        {%- capture input_name -%}
+          {{ option.name }}-{{ option.position }}
+        {%- endcapture -%}
+         <fieldset class="js product-form__input product-form__input--pill" data-option-name="{{ option.name }}" data-option-index="{{ option.position }}">
+          <legend class="form__label">
+            {{ option.name }}
+          </legend>
+        <div class="size-select">
+         <div class="size-select__box"> <span class="size-select__selected">Choose your size </span><span class="select_down_arrow">{{ "icon-arrow-down.svg" | inline_asset_content }}</span></div>
+          <ul class="size-select__list">
+          {% for value in option.values %}
+            <li class="size-select__list-item" data-value="{{ value | escape }}">{{ value | escape }}</li>
+          {% endfor %}
+          </ul>
+        </div>
+        </fieldset>
+      {% endcapture %}
+    {% endif %}
+    {% if color_option_names contains option.name %}
+      {% capture color_variant_markup %}
+        {%- capture input_name -%}
+          {{ option.name }}-{{ option.position }}
+        {%- endcapture -%}
+        <fieldset class="js product-form__input product-form__input--pill" data-option-name="{{ option.name }}" data-option-index="{{ option.position }}">
+          <legend class="form__label">
+            {{ option.name }}
+          </legend>
+          {%- for value in option.values -%}
+            {%- capture input_id -%}
+              {{ section.id }}-{{ option.position }}-{{ forloop.index0 -}}
+            {%- endcapture -%}
+            <input
+              type="radio"
+              id="{{ input_id }}"
+              name="{{ input_name | escape }}"
+              value="{{ value | escape }}"
+              form="{{ product_form_id }}"
+              {% if value == option.selected_value %}
+                checked
+              {% endif %}
+              {% if option_disabled %}
+                class="disabled"
+              {% endif %}
+              {{ input_dataset }}
+            >
+            <label for="{{ input_id }}" style="--clr:{{ value }}">
+              {{ value -}}
+              {{ label_unavailable }}
+            </label>
+          {% endfor %}
+        </fieldset>
+      {% endcapture %}
+    {% endif %}
+  {% endfor %}
+
+  <div class="variant-option-group">
+    {{ color_variant_markup }}
+  </div>
+  <div class="variant-option-group">
+    {{ size_variant_markup }}
+  </div>
+  <script id="quick-view-variant-data" variant-data>{{ product.variants | json }}</script>
+
+</variant-picker>
+

@@ -1,0 +1,141 @@
+{{ 'hotspot-grid.css' | asset_url | stylesheet_tag }}
+{{ 'quick-view.css' | asset_url | stylesheet_tag }}
+{{ 'variant-picker.css' | asset_url | stylesheet_tag }}
+<script src="{{ "hotspot-grid.js" | asset_url }}" defer></script>
+<script src="{{ "variant-picker.js" | asset_url }}" defer></script>
+
+{% style %}
+  #shopify-section-{{section.id }}{
+    padding-top: 33px;
+    padding-bottom: 27px;
+    font-family: 'Jost', sans-serif;
+    font-size: 16px;
+    letter-spacing: 0;
+    line-height: 1.2;
+    font-weight: 400;
+    color: #000000;
+  }
+
+  @media screen and (min-width: 750px) {
+    #shopify-section-{{section.id }} {
+      padding-top: 90px;
+      padding-bottom: 50px;
+    }
+  }
+{% endstyle %}
+
+<hotspot-grid>
+  <div class="custom-page-width">
+    {% if section.settings.heading != blank or section.settings.sub_heading != blank %}
+      <div class="collection__title title-wrapper title-wrapper--no-top-margin align-{{ section.settings.heading_align }}">
+        {% if section.settings.heading != blank %}
+          <h2 class="title h2">{{ section.settings.heading | escape }}</h2>
+        {% endif %}
+
+        {% if section.settings.sub_heading != blank %}
+          <p>{{ section.settings.sub_heading }}</p>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="hotspot-collection-grid">
+      {% for block in section.blocks %}
+        <div class="hotspot-collection-grid__item" data-index="{{ forloop.index }}" {{ block.shopify_attributes }}>
+          {% if block.settings.product != blank %}
+            {% assign product = block.settings.product %}
+            <div class="hotspot-collection-grid__media-wrapper">
+              {{ product.featured_image | image_url: width: 800 | image_tag }}
+              <button
+                data-hotspot-tracker
+                class="hotspot-collection-grid__tracker"
+                style="top: {{ block.settings.top }}%; left: {{ block.settings.left }}%"
+                data-handle="{{ product.handle }}"
+                aria-label="Quick view {{ product.title | escape }}"
+              >
+                {{ 'icon-hotspot.svg' | inline_asset_content }}
+              </button>
+            </div>
+          {% else %}
+            <div class="hotspot-collection-grid__media-wrapper">
+              {{ 'product-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
+            </div>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <dialog class="quick-view-dialog" id="quick-view-dialog-{{ section.id }}" aria-label="View Product" aria-modal="true">
+    <button class="quick-view-dialog__close" aria-label="Close quick view">{{ 'icon-close-v2.svg' | inline_asset_content }}</button>
+    <div class="quick-view-dialog__content">
+      <div class="quick-view"></div>
+      <div class="custom-loading__spinner">
+        <div class="quick-view-dialog__content__loading__spinner">
+          {{ 'loading-spinner.svg' | inline_asset_content }}
+        </div>
+      </div>
+    </div>
+  </dialog>
+</hotspot-grid>
+
+{% schema %}
+{
+  "name": "Hotspot Grid",
+  "tag": "section",
+  "class": "section cc-hotspot-grid",
+  "presets": [
+    {
+      "name": "Hotspot Grid",
+      "category": "Ecommexperts Test",
+      "blocks": [{ "type": "item" }, { "type": "item" }, { "type": "item" }]
+    }
+  ],
+  "settings": [
+    { "type": "header", "content": "Header" },
+    { "type": "text", "label": "Heading", "id": "heading", "default": "Tisso vison in the wild" },
+    { "type": "textarea", "label": "Sub heading", "id": "sub_heading" },
+    {
+      "type": "select",
+      "label": "Heading alignment",
+      "id": "heading_align",
+      "options": [
+        { "label": "Left", "value": "start" },
+        { "label": "Center", "value": "center" },
+        { "label": "Right", "value": "end" }
+      ],
+      "default": "start"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "item",
+      "name": "Product",
+      "limit": 6,
+      "settings": [
+        { "type": "product", "id": "product", "label": "Select product" },
+        { "type": "header", "content": "Hotspot position" },
+        {
+          "type": "range",
+          "id": "top",
+          "label": "Vertical position",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "default": 50,
+          "unit": "%"
+        },
+        {
+          "type": "range",
+          "id": "left",
+          "label": "Horizontal position",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "default": 50,
+          "unit": "%"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

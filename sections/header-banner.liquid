@@ -1,0 +1,201 @@
+{% comment %}
+  Header & Banner section
+{% endcomment %}
+{{ 'header-banner.css' | asset_url | stylesheet_tag }}
+
+{% style %}
+  #shopify-section-{{ section.id }}{
+    font-family: 'Jost', sans-serif;
+    font-size: 16px;
+    letter-spacing: 0;
+    line-height: 13.42px;
+    font-weight: 400;
+    color: {{ section.settings.text_color }};
+    --section-primary-color: #FFF544;
+    --section-secondary-color: #000000;
+    --section-bg-color:{{ section.settings.bg_color }};
+    --section-text-color:{{ section.settings.text_color }};
+    }
+{% endstyle %}
+
+<!-- Header -->
+<header class="custom-header">
+  <div class="custom-header__container custom-page-width">
+    <!-- Mobile Menu -->
+    <details class="main-menu__disclosure mobile-only">
+      <summary class="main-menu__toggle-icon">
+        <span class="icon-menu icon">{{ 'icon-menu-hamburger.svg' | inline_asset_content }}</span>
+        <span class="icon-close icon">{{ 'icon-menu-close.svg' | inline_asset_content }}</span>
+      </summary>
+      <div class="main-menu__content">
+        <p>{{ section.settings.tagline }}</p>
+        <a href="{{ section.settings.header_cta_link }}" class="cta cta-primary">
+          <span>{{ section.settings.header_cta_label | escape }}</span>
+          <span class="icon">{{ 'icon-arrow-right.svg' | inline_asset_content }}</span>
+        </a>
+      </div>
+    </details>
+
+    <!-- Desktop Menu -->
+    <div class="custom-header__logo">
+      <a href="{{ section.settings.logo_url | default:"/" }}" class="">
+        {% if section.settings.logo_type == 'logo' and section.settings.logo_image != blank %}
+          {{ section.settings.logo_image | image_url: width: 150 | image_tag }}
+        {% else %}
+          {{ section.settings.logo_text | escape | default: 'Logo Text' }}
+        {% endif %}
+      </a>
+    </div>
+    {% if section.settings.tagline %}
+      <div class="custom-header__center desktop-only">
+        {% comment %} Menu Can be here {% endcomment %}
+        <p>{{ section.settings.tagline }}</p>
+      </div>
+    {% endif %}
+    {% if section.settings.header_cta_label %}
+      <div class="custom-header__buttons desktop-only">
+        {% comment %} Buttons or login icons {% endcomment %}
+        {% if section.settings.header_cta_label != blank %}
+          <a href="{{ section.settings.header_cta_link }}" class="cta cta-primary">
+            <span>{{ section.settings.header_cta_label | escape }}</span>
+            <span class="icon">{{ 'icon-arrow-right.svg' | inline_asset_content }}</span>
+          </a>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+</header>
+
+<!-- HERO Banner -->
+<div class="custom-hero">
+  <div class="custom-hero__image-wrap">
+    <div class="custom-hero__overlay-content">
+      <div class="custom-hero__content">
+        {% if section.settings.hero_heading != blank %}
+          <h2>{{ section.settings.hero_heading | escape }}</h2>
+        {% endif %}
+        {% if section.settings.hero_description_desktop != blank or section.settings.hero_description_mobile != blank %}
+          <p class="desktop-only">{{ section.settings.hero_description_desktop }}</p>
+          <p class="mobile-only">{{ section.settings.hero_description_mobile }}</p>
+        {% endif %}
+        {% if section.settings.hero_cta_label != blank %}
+          <a href="{{ section.settings.hero_cta_link }}" class="cta cta-secondary custom-hero__overlay-btn">
+            <span>{{ section.settings.hero_cta_label | escape }}</span>
+            <span class="icon">{{ 'icon-arrow-right.svg' | inline_asset_content }}</span>
+          </a>
+        {% endif %}
+      </div>
+    </div>
+    {% if section.settings.desktop_image != blank %}
+      <div class="custom-hero__desktop-image">
+        {{ section.settings.desktop_image | image_url: width: 2000 | image_tag }}
+      </div>
+    {% else %}
+      <div class="custom-hero__desktop-image">
+        {{ 'hero-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
+      </div>
+    {% endif %}
+
+    {% if section.settings.mobile_image != blank %}
+      <div class="custom-hero__mobile-image">
+        {{ section.settings.mobile_image | image_url: width: 800 | image_tag }}
+      </div>
+    {% else %}
+      <div class="custom-hero__mobile-image">
+        {{ 'hero-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- HERO Footer Strip -->
+{% if section.settings.footer_text_desktop != blank or section.settings.footer_text_mobile != blank %}
+  <div class="custom-footer-strip">
+    <p class="desktop-only">{{ section.settings.footer_text_desktop }}</p>
+    <p class="mobile-only">{{ section.settings.footer_text_mobile }}</p>
+  </div>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Header & Banner",
+  "tag": "section",
+  "class": "section cc-header-hero",
+  "presets": [{ "name": "Header & Banner", "category": "Ecommexperts Test" }],
+  "settings": [
+    { "type": "header", "content": "Top bar" },
+    {
+      "type": "select",
+      "label": "Logo type",
+      "id": "logo_type",
+      "options": [
+        { "label": "Logo", "value": "logo" },
+        { "label": "Text", "value": "text" }
+      ],
+      "default": "logo"
+    },
+    {
+      "type": "image_picker",
+      "label": "Logo image",
+      "id": "logo_image",
+      "visible_if": "{{ section.settings.logo_type == 'logo' }}"
+    },
+    {
+      "type": "text",
+      "label": "Logo text",
+      "id": "logo_text",
+      "visible_if": "{{ section.settings.logo_type == 'text' }}",
+      "default": "Tisso Vision"
+    },
+    { "type": "url", "label": "Logo link", "id": "logo_url" },
+    {
+      "type": "text",
+      "label": "Center tagline",
+      "id": "tagline",
+      "default": "Find the ideal gift for your loved ones."
+    },
+    { "type": "text", "label": "Button label", "id": "header_cta_label", "default": "Choose Gift" },
+    { "type": "url", "label": "Button link", "id": "header_cta_link" },
+
+    { "type": "header", "content": "Hero image/content" },
+    { "type": "image_picker", "label": "Desktop Image", "id": "desktop_image" },
+    { "type": "image_picker", "label": "Mobile Image", "id": "mobile_image" },
+
+    { "type": "paragraph", "content": "Overlay content for hero" },
+    { "type": "text", "label": "Heading", "id": "hero_heading", "default": "The Gift Guide" },
+    {
+      "type": "textarea",
+      "label": "Description desktop",
+      "id": "hero_description_desktop",
+      "default": "Discover Joy: Your Ultimate Holiday Gift Destination. Explore our curated selection and find the perfect gifts to delight your loved ones this holiday season."
+    },
+    {
+      "type": "textarea",
+      "label": "Description mobile",
+      "id": "hero_description_mobile",
+      "default": "Discover Joy: Your Ultimate Holiday Gift Destination."
+    },
+    { "type": "text", "label": "Button label", "id": "hero_cta_label", "default": "Shop Now" },
+    { "type": "url", "label": "Button link", "id": "hero_cta_link" },
+
+    { "type": "header", "content": "Footer strip" },
+    {
+      "type": "textarea",
+      "label": "Strip text desktop",
+      "id": "footer_text_desktop",
+      "default": "SUSTAINABLE, ETHICALLY MADE CLOTHES IN SIZES XXS TO 6XL"
+    },
+
+    {
+      "type": "textarea",
+      "label": "Strip text mobile",
+      "id": "footer_text_mobile",
+      "default": "SUSTAINABLE, ETHICALLY MADE ACTIVEWEAR"
+    },
+
+    { "type": "header", "content": "Colors" },
+    { "type": "color", "label": "Text color", "id": "text_color", "default": "#000000" },
+    { "type": "color", "label": "Background color", "id": "bg_color", "default": "#F5F5F5" }
+  ]
+}
+{% endschema %}
